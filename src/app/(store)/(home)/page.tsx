@@ -1,19 +1,26 @@
 import { api } from '@/data/api';
 import { Product } from '@/data/types/product';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from "next/link";
 
 /**
  * Cache & Memoization
+ * On NextJS 15 If you are using **fetch, requests can be memoized by adding cache: 'force-cache'
+ * In previous versions of Next.js, using **fetch would have a default cache value of force-cache. This changed in version 15, to a default of cache: no-store.
 */
 const getFeaturedProducts = async (): Promise<Product[]> => {
   const response = await api('/products/featured', {
     next: {
-      revalidate: 60 * 60, // 1 hour
+      revalidate: 3600, // 1 hour
     },
   })
   const products = await response.json()
   return products
+}
+
+export const metadata: Metadata = {
+  title: 'Home',
 }
 
 export default async function Home() {
