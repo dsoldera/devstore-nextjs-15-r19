@@ -5,3 +5,6 @@
 
 ## Tech
 - Using Fetch API because the Axios is using internal a lib that is too old and it will cancel the NextJs cache feature
+
+## E2E Tests
+- Cypress

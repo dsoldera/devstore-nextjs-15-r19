@@ -2,12 +2,25 @@ import { api } from '@/data/api'
 import { Product } from '@/data/types/product'
 import Image from 'next/image'
 
+import { AddToCartButton } from '@/components/add-to-cart-button'
 import { Metadata } from 'next'
 
 interface ProductProps {
-  params: {
-    slug: string
-  }
+  params: Promise<{ slug: string }>
+}
+
+/**
+ * used only for important pages products or info
+ * not used for all pages. 
+ * @returns array with the slugs of the products
+ */
+export async function generateStaticParams() {
+  const response = await api('/products/featured')
+  const products: Product[] = await response.json()
+
+  return products.map((product) => {
+    return { slug: product.slug }
+  })
 }
 
 async function getProduct(slug: string): Promise<Product> {
@@ -22,11 +35,10 @@ async function getProduct(slug: string): Promise<Product> {
   return product
 }
 
-export async function generateMetadata({
-  params,
-}: ProductProps): Promise<Metadata> {
-  const param = await params
-  const product = await getProduct(param.slug)
+export async function generateMetadata(
+  { params }: ProductProps): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProduct(slug)
 
   return {
     title: product.title,
@@ -42,8 +54,8 @@ export default async function ProductPage({
     params: Promise<{ slug: string }>;
   }>
 ) {
-  const param = await params;
-  const product = await getProduct(param.slug)
+  const { slug } = await params;
+  const product = await getProduct(slug)
   
   return (
     <div className="relative grid max-h-[860px] grid-cols-3">
@@ -103,13 +115,7 @@ export default async function ProductPage({
             </button>
           </div>
         </div>
-
-        <button
-          type="button"
-          className="mt-8 flex h-12 items-center justify-center rounded-full bg-emerald-600 font-semibold text-white"
-        >
-          Adicionar ao carrinho
-        </button>
+        <AddToCartButton productId={product.id} />
       </div>
     </div>
   )
