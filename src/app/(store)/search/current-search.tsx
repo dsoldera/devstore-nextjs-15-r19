@@ -1,4 +1,4 @@
-'use client'Add commentMore actions
+'use client'
 
 import { useSearchParams } from 'next/navigation'
 
